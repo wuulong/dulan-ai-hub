@@ -1,0 +1,115 @@
+{
+  "region": "dulan",
+  "title": "都蘭常見與文化生態系指標鳥類名錄",
+  "description": "涵蓋都蘭聚落、農園、次生林與草生地之 12 種經典指標鳥種",
+  "species": [
+    {
+      "id": "bird-01",
+      "category": "低海拔聚落鳴禽",
+      "common_name": "白頭翁",
+      "scientific_name": "Pycnonotus sinensis",
+      "ebird_code": "lcbchi1",
+      "habitat": "聚落樹木、果園與公園",
+      "notes": "全台常見平地鳴禽，在東部都蘭與烏頭翁有雜交接觸帶 (Hybrid Zone)，是重要演化觀察指標。"
+    },
+    {
+      "id": "bird-02",
+      "category": "臺灣特有種 (珍貴稀有)",
+      "common_name": "臺灣畫眉",
+      "scientific_name": "Garrulax taewanus",
+      "ebird_code": "taiwhi2",
+      "habitat": "低海拔濃密灌叢與草生林緣",
+      "notes": "臺灣特有種，二級保育類，鳴聲嘹亮婉轉，棲息於都蘭林下灌叢。"
+    },
+    {
+      "id": "bird-03",
+      "category": "低海拔山林鳴禽",
+      "common_name": "紅嘴黑鵯",
+      "scientific_name": "Hypsipetes leucocephalus",
+      "ebird_code": "blabul1",
+      "habitat": "次生林林冠層與山坡樹林",
+      "notes": "紅嘴紅腳黑色羽毛，布農族與泰雅族神話中的聖鳥（銜火救族人），鳴聲似貓叫或尖銳哨音。"
+    },
+    {
+      "id": "bird-04",
+      "category": "東部特有種指標",
+      "common_name": "烏頭翁",
+      "scientific_name": "Pycnonotus taivanus",
+      "ebird_code": "taiwan1",
+      "habitat": "東部聚落、農園、防風林與灌叢",
+      "notes": "臺灣特有種，僅分布於東部花東與恆春半島，都蘭最優勢且具代表性的日常鳴禽。"
+    },
+    {
+      "id": "bird-05",
+      "category": "山林與林緣鳥",
+      "common_name": "樹鵲",
+      "scientific_name": "Dendrocitta formosae",
+      "ebird_code": "gretre1",
+      "habitat": "中低海拔闊葉林與果園",
+      "notes": "長尾、黑面灰身，叫聲多變喧鬧，常成小群在都蘭樹林中上層活動。"
+    },
+    {
+      "id": "bird-06",
+      "category": "臺灣特有種 (林冠啄木)",
+      "common_name": "五色鳥",
+      "scientific_name": "Psilopogon nuchalis",
+      "ebird_code": "taibarb1",
+      "habitat": "闊葉次生林、校園與老樹林",
+      "notes": "臺灣特有種，花和尚，都蘭春夏季林間『郭、郭、郭』似木魚敲擊的宏亮鳴聲主角。"
+    },
+    {
+      "id": "bird-07",
+      "category": "農田草生地",
+      "common_name": "褐頭鷦鶯",
+      "scientific_name": "Prinia inornata",
+      "ebird_code": "plapri1",
+      "habitat": "甘蔗田、草生地、灌叢與農路旁",
+      "notes": "常棲息於草莖頂端，尾羽常上下擺動，發出單調似芒草摩擦的『滴、滴、滴』啼聲。"
+    },
+    {
+      "id": "bird-08",
+      "category": "農田草生地",
+      "common_name": "灰頭鷦鶯",
+      "scientific_name": "Prinia flaviventris",
+      "ebird_code": "yebpri1",
+      "habitat": "低海拔長草地、水澤周邊與灌木叢",
+      "notes": "俗稱布袋鳥，頭部石灰色，腹部淡黃色，叫聲細緻似小羊叫聲，築精巧布袋狀巢。"
+    },
+    {
+      "id": "bird-09",
+      "category": "臺灣特有種 (地棲雉雞)",
+      "common_name": "臺灣竹雞",
+      "scientific_name": "Bambusicola sonorivox",
+      "ebird_code": "taiphe1",
+      "habitat": "濃密竹林、林下落葉層與隱蔽灌叢",
+      "notes": "臺灣特有種，極具領域性，常在清晨或黃昏齊聲高唱『雞狗乖、雞狗乖』，響徹都蘭山麓。"
+    },
+    {
+      "id": "bird-10",
+      "category": "聚落伴人鳥",
+      "common_name": "麻雀",
+      "scientific_name": "Passer montanus",
+      "ebird_code": "eutspa",
+      "habitat": "聚落房舍、農田與屋簷",
+      "notes": "最親近人類聚落的常客，都蘭曬稻與農作收穫期成群活躍於農舍庭院。"
+    },
+    {
+      "id": "bird-11",
+      "category": "草生地大型雉科",
+      "common_name": "環頸雉",
+      "scientific_name": "Phasianus colchicus",
+      "ebird_code": "rinphe1",
+      "habitat": "開闊旱田、甘蔗田與平原草生地",
+      "notes": "臺灣特有亞種，俗稱啼雞，雄鳥羽色極其華麗，常在清晨於興昌與都蘭開闊田野昂首啼鳴。"
+    },
+    {
+      "id": "bird-12",
+      "category": "平原農園鳩鴿",
+      "common_name": "紅鳩",
+      "scientific_name": "Streptopelia tranquebarica",
+      "ebird_code": "redcol1",
+      "habitat": "農耕地、電線桿、村落樹木與開闊地",
+      "notes": "臺灣體型最小的鳩鴿科，雄鳥背部呈優雅酒紅色，都蘭田野極常見的小型野鴿。"
+    }
+  ]
+}

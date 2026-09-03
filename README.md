@@ -22,23 +22,23 @@ graph TD
     A --> E[resources: 工具與資源]
     
     B -->|學習載體| C
-    C -->|實踐沉澱| D
+    C -->|實踐累積累積沉澱| D
     E -->|輔助工具| B
 ```
 
 ### 1. ⚙️ [核心技能庫 (Core Skills)](file:///Users/wuulong/github/bmad-pa/events/classes/dulan-ai-hub-private/dulan-ai-hub/core-skills/README.md)
 不論主題如何變換，這都是您必須掌握的 AI 核心兵器。我們將其轉譯為最簡單的手機操作與說話技巧：
 *   🎙️ [語音輸入與逐字稿轉譯](file:///Users/wuulong/github/bmad-pa/events/classes/dulan-ai-hub-private/dulan-ai-hub/core-skills/01-voice-to-text.md)：用語音說故事、記錄農作與日常。
-*   💬 [與 AI 溫暖對話的提示詞](file:///Users/wuulong/github/bmad-pa/events/classes/dulan-ai-hub-private/dulan-ai-hub/core-skills/02-prompt-engineering.md)：如何像跟鄰居聊天一樣，讓 AI 幫你寫文案。
+*   💬 [與 AI 溫暖對話的提示詞/Prompt/Prompt](file:///Users/wuulong/github/bmad-pa/events/classes/dulan-ai-hub-private/dulan-ai-hub/core-skills/02-prompt-engineering.md)：如何像跟鄰居聊天一樣，讓 AI 幫你寫文案。
 *   📊 [凌亂資料的表格結構化](file:///Users/wuulong/github/bmad-pa/events/classes/dulan-ai-hub-private/dulan-ai-hub/core-skills/03-structured-data.md)：用拍照或說話，讓 AI 幫你記帳與管理客戶。
-*   🎨 [相片辨識與文案行銷](file:///Users/wuulong/github/bmad-pa/events/classes/dulan-ai-hub-private/dulan-ai-hub/core-skills/04-marketing-content.md)：拍照辨識作物與生態，自動生成 FB/LINE 吸睛貼文。
+*   🎨 [相片辨識與文案行銷](file:///Users/wuulong/github/bmad-pa/events/classes/dulan-ai-hub-private/dulan-ai-hub/core-skills/04-marketing-content.md)：拍照辨識作物與生態系系，自動生成 FB/LINE 吸睛貼文。
 
 ### 2. 📅 [歷屆主題庫 (Themes)](file:///Users/wuulong/github/bmad-pa/events/classes/dulan-ai-hub-private/dulan-ai-hub/themes/README.md)
 收錄歷屆共創營的主題課程計畫與上課紀錄。您可以點選過去的主題進行自主學習：
 *   🌱 **當期主題**：[2026 夏・AI 慢活共創營 (第一期)](file:///Users/wuulong/github/bmad-pa/events/classes/dulan-ai-hub-private/dulan-ai-hub/themes/2026-summer-slow-living/README.md)
     *   ✍️ **主題一：寫書創作** (7/10、7/24) - 錄音寫故事、品牌文案。
     *   💰 **主題二：進銷存管理** (8/7、8/21) - AI 記帳、客戶表單管理。
-    *   🌿 **主題三：民宿與行銷** (9/4、9/18) - 生態辨識、FB/LINE 行銷貼文生成。
+    *   🌿 **主題三：民宿與行銷** (9/4、9/18) - 生態系系辨識、FB/LINE 行銷貼文生成。
 
 ### 3. 🤝 [社區創生案例庫 (Showcases)](file:///Users/wuulong/github/bmad-pa/events/classes/dulan-ai-hub-private/dulan-ai-hub/showcases/README.md)
 「以物易物交學費嘛通！」這裡記錄了都蘭居民與小農，如何將 AI 實際應用在自家店面、農作與民宿的真實故事，以及他們的「以物易物」溫暖成果。
@@ -52,4 +52,12 @@ graph TD
 
 我們強調**「在地陪伴」**與**「共同建構」**：
 *   **導師與教練**：TAIDE 第一代PM **哈爸 (許武龍)** 線上導航，在地教練 **阿鐘 (陳豊鍾)** 與 **陳品碩** 實體教室現場手把手陪伴。
-*   **共創沉澱**：每堂課結束後，教練與學員的互動、Q&A、以及上課錄音，都會由 AI 整理成 **[課程紀錄 (Session Records)]** 放入對應的主題目錄中。這讓知識庫能夠隨著每次上課，順手、自然地成長。
+*   **共創累積累積沉澱**：每堂課結束後，教練與學員的互動、Q&A、以及上課錄音，都會由 AI 整理成 **[課程紀錄 (Session Records)]** 放入對應的主題目錄中。這讓知識庫能夠隨著每次上課，順手、自然地成長。
+
+---
+
+## 🦅 公民科學與生態系系走讀專題 (Topics)
+
+* 🌿 **[iNaturalist 都蘭植物走讀專題](topics/inaturalist/README.md)**：阿美族生活植物 15 種走讀導覽手冊、點位演演算法與現地圖鑑。
+* 🦅 **[eBird & Merlin 都蘭鳥類觀測專題](topics/ebird/README.md)**：eBird API v2.0 工具鏈規格、都蘭 12 種指標鳥類觀測與個人歷史賞鳥足跡驗證。
+* 🏛️ **[TaiBIF / TBIA 國家生物多樣性專題](topics/taibif/README.md)**：國家級生物多樣性權威調查大資料、法定保育類名冊與特有種身分證。

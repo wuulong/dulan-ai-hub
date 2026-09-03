@@ -4,11 +4,12 @@
 [metadata]
 name: inat_cli.py
 title: iNaturalist 在地生態系與原民植物分析 CLI
-description: 符合 CGS v2.0 規範的 iNaturalist 公民科學觀測資料查詢、二階段下鑽、都蘭原住民植物名錄對照整合比對、垂直海拔梯度與物候季節性分析工具。
-category: gis
-manual: scripts/manuals/inat_cli.md
+description: 符合 CGS v2.1 規範的 iNaturalist 公民科學觀測資料查詢、二階段下鑽、都蘭原住民植物名錄對照整合比對、垂直海拔梯度與物候季節性分析工具。支援多物種批次檢索與同義學名自動容錯比對。
+category: ecology
+spec: @dulan-ai-hub/topics/inaturalist/inaturalist-dulan-flora-cli-spec.md
+manual: @dulan-ai-hub/manuals/inat_cli.md
 dependencies: urllib, json
-cgs_version: 2.0
+cgs_version: 2.1
 """
 
 import os
@@ -24,13 +25,16 @@ from datetime import datetime
 from typing import Dict, Any, List, Optional, Tuple
 
 # 顯式宣告 CGS 規格版號
-__cli_spec_version__ = "2.0"
+__cli_spec_version__ = "2.1"
 
-WORKSPACE_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
-MANUAL_PATH = "scripts/manuals/inat_cli.md"
-DEFAULT_PLACES_PATH = os.path.join(WORKSPACE_ROOT, "data/ecology/places.json")
-DEFAULT_FLORA_PATH = os.path.join(WORKSPACE_ROOT, "data/ecology/indigenous_flora.json")
-DEFAULT_CACHE_DIR = os.path.join(WORKSPACE_ROOT, ".cache/inat")
+# 定錨至 dulan-ai-hub 專案根目錄
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+WORKSPACE_ROOT = PROJECT_ROOT
+SPEC_PATH = os.path.join(PROJECT_ROOT, "topics/inaturalist/inaturalist-dulan-flora-cli-spec.md")
+MANUAL_PATH = os.path.join(PROJECT_ROOT, "manuals/inat_cli.md")
+DEFAULT_PLACES_PATH = os.path.join(PROJECT_ROOT, "data/ecology/places.json")
+DEFAULT_FLORA_PATH = os.path.join(PROJECT_ROOT, "data/ecology/indigenous_flora.json")
+DEFAULT_CACHE_DIR = os.path.join(PROJECT_ROOT, ".cache/inat")
 
 _log_file_handle = None
 
@@ -104,22 +108,22 @@ def get_schema() -> Dict[str, Any]:
         "domain": "inat",
         "cgs_version": "2.0",
         "script": "scripts/gis/inat_cli.py",
-        "description": "iNaturalist 在地生態系與原民植物分析 CLI，支援使用者觀察查詢、原民植物對照整合、海拔與物候分析",
+        "description": "iNaturalist 在地生態系與原民植物分析 CLI，支援使用者觀察查詢、批次多物種檢索、原民植物對照整合、海拔與物候分析",
         "commands": {
             "user": {
                 "description": "查詢 iNaturalist 使用者畫像、總觀察數、物種數與研究級比例",
                 "args": ["username"]
             },
             "search": {
-                "description": "多條件輕量搜尋觀測紀錄（二階段下鑽之第一階段）",
-                "args": ["--user", "--taxon", "--place", "--place-config", "--quality", "-n/--limit"]
+                "description": "多條件輕量搜尋觀測紀錄（支援 --taxon 單物種、--taxa 多物種逗號分隔、--flora-file 批次整份名錄查詢）",
+                "args": ["--user", "--taxon", "--taxa", "--flora-file", "--place", "--place-config", "--quality", "-n/--limit"]
             },
             "fetch": {
                 "description": "指定 Observation ID 取得單筆詳細資料（二階段下鑽之第二階段）",
                 "args": ["observation_id"]
             },
             "match-flora": {
-                "description": "將原住民族傳統植物名錄與指定使用者/地區之觀測紀錄對照整合比對",
+                "description": "將原住民族傳統植物名錄與指定使用者/地區之觀測紀錄對照整合比對（支援 synonyms 自動容錯與點位坐標輸出）",
                 "args": ["--user", "--place", "--flora-file", "--quality"]
             },
             "analyze": {
@@ -154,7 +158,6 @@ class InatClient:
 
     def request(self, endpoint: str, params: Optional[Dict[str, Any]] = None, expire_hours: int = 24) -> Dict[str, Any]:
         params = params or {}
-        # 強制加入台灣繁體中文在地化設定
         params.setdefault("locale", "zh-TW")
         params.setdefault("preferred_place_id", 7140)
 
@@ -291,53 +294,106 @@ def cmd_user(args, client: InatClient):
         print(f"   └─ 註冊日期: {user_data['created_at'][:10] if user_data['created_at'] else 'N/A'}\n")
 
 def cmd_search(args, client: InatClient):
-    """多條件搜尋觀測清單 (輕量輸出)"""
+    """多條件搜尋觀測清單 (支援單物種、--taxa 多物種逗號分隔、--flora-file 名錄批次檢索)"""
     limit_val = getattr(args, "limit", 20)
-    params = {"per_page": min(limit_val, 100), "order_by": "observed_on", "order": "desc"}
-    if args.user:
-        params["user_id"] = args.user
-    if args.taxon:
-        params["taxon_name"] = args.taxon
-    if args.quality and args.quality != "any":
-        params["quality_grade"] = args.quality
-
     _, place_info = load_place_config(args.place, args.place_config)
     spatial_params = build_spatial_params(place_info, args.bbox, args.lat, args.lng, args.radius)
-    params.update(spatial_params)
 
-    log_msg("INFO", f"執行觀察紀錄檢索 (限制: {limit_val} 筆)...", verbose=args.verbose)
-    res = client.request("observations", params)
-    total = res.get("total_results", 0)
-    records = res.get("results", [])
-
-    compact_records = []
-    for r in records:
-        taxon = r.get("taxon") or {}
-        compact_records.append({
-            "id": r.get("id"),
-            "observed_on": r.get("observed_on"),
-            "common_name": taxon.get("preferred_common_name") or taxon.get("name") or "未知",
-            "scientific_name": taxon.get("name") or "Unknown",
-            "place_guess": r.get("place_guess") or "N/A",
-            "quality_grade": r.get("quality_grade"),
-            "photos_count": len(r.get("photos", [])),
-            "geojson": r.get("geojson")
+    target_queries = []
+    # 模式 1: 傳入植物清單設定檔批次搜尋
+    if getattr(args, "flora_file", None):
+        flora_data = load_flora_config(args.flora_file)
+        for sp in flora_data.get("species", []):
+            target_queries.append({
+                "query": sp["scientific_name"],
+                "common_name": sp.get("common_name"),
+                "indigenous_name": sp.get("indigenous_name"),
+                "synonyms": sp.get("synonyms", [])
+            })
+    # 模式 2: 傳入多個物種逗號分隔 (--taxa "A,B,C")
+    elif getattr(args, "taxa", None):
+        for t in args.taxa.split(","):
+            t_clean = t.strip()
+            if t_clean:
+                target_queries.append({"query": t_clean, "common_name": t_clean, "indigenous_name": "-", "synonyms": []})
+    # 模式 3: 單一物種或無限定物種
+    else:
+        target_queries.append({
+            "query": args.taxon,
+            "common_name": args.taxon or "全部",
+            "indigenous_name": "-",
+            "synonyms": []
         })
 
+    all_compact_records = []
+    total_found_sum = 0
+
+    log_msg("INFO", f"執行觀察紀錄檢索 (查詢物種數: {len(target_queries)}, 每種上限: {limit_val} 筆)...", verbose=args.verbose)
+
+    for item in target_queries:
+        query_taxon = item["query"]
+        candidates = [query_taxon] if query_taxon else [None]
+        if item["synonyms"]:
+            candidates.extend(item["synonyms"])
+
+        found_records_for_item = []
+        for candidate in candidates:
+            params = {"per_page": min(limit_val, 100), "order_by": "observed_on", "order": "desc"}
+            if args.user:
+                params["user_id"] = args.user
+            if candidate:
+                params["taxon_name"] = candidate
+            if args.quality and args.quality != "any":
+                params["quality_grade"] = args.quality
+            params.update(spatial_params)
+
+            try:
+                res = client.request("observations", params)
+                records = res.get("results", [])
+                if records:
+                    found_records_for_item = records
+                    total_found_sum += res.get("total_results", 0)
+                    break  # 命中則停止嘗試後續同義詞
+            except Exception as e:
+                log_msg("DEBUG", f"查詢 {candidate} 異常: {e}", verbose=args.verbose)
+
+        for r in found_records_for_item:
+            taxon = r.get("taxon") or {}
+            coords = (r.get("geojson") or {}).get("coordinates", [None, None])
+            all_compact_records.append({
+                "id": r.get("id"),
+                "observed_on": r.get("observed_on"),
+                "common_name": taxon.get("preferred_common_name") or taxon.get("name") or "未知",
+                "scientific_name": taxon.get("name") or "Unknown",
+                "matched_query": item["common_name"],
+                "indigenous_name": item["indigenous_name"],
+                "user": (r.get("user") or {}).get("login"),
+                "latitude": coords[1],
+                "longitude": coords[0],
+                "place_guess": r.get("place_guess") or "N/A",
+                "quality_grade": r.get("quality_grade"),
+                "photos_count": len(r.get("photos", [])),
+                "photo_url": ((r.get("photos") or [{}])[0]).get("url")
+            })
+
     if args.json:
-        output_data = {"total_results": total, "count": len(compact_records), "records": compact_records}
+        output_data = {
+            "total_species_queried": len(target_queries),
+            "count": len(all_compact_records),
+            "records": all_compact_records
+        }
         print(json.dumps(output_data, ensure_ascii=False, separators=(',', ':')))
     elif args.quiet:
-        for cr in compact_records:
-            print(f"{cr['id']}\t{cr['common_name']}\t{cr['scientific_name']}\t{cr['observed_on']}")
+        for cr in all_compact_records:
+            print(f"{cr['id']}\t{cr['common_name']}\t{cr['latitude']},{cr['longitude']}\t{cr['user']}\t{cr['observed_on']}")
     else:
-        print(f"\n🔍 檢索結果 (總計 {total:,} 筆，顯示前 {len(compact_records)} 筆):")
-        print("-" * 75)
-        for cr in compact_records:
-            date_str = cr['observed_on'] or "無日期"
-            print(f"[{cr['id']}] {cr['common_name']} ({cr['scientific_name']})")
-            print(f"      📅 {date_str} | 📍 {cr['place_guess']} | ⭐ {cr['quality_grade']}")
-        print("-" * 75 + "\n")
+        print(f"\n🔍 批次檢索結果 (共涵蓋 {len(target_queries)} 項物種，取得 {len(all_compact_records)} 筆紀錄):")
+        print("-" * 80)
+        for cr in all_compact_records:
+            coord_str = f"({cr['latitude']:.5f}, {cr['longitude']:.5f})" if cr['latitude'] and cr['longitude'] else "無座標"
+            print(f"[{cr['id']}] {cr['common_name']} ({cr['scientific_name']}) | 族語: {cr['indigenous_name']}")
+            print(f"      📅 {cr['observed_on']} | 👤 @{cr['user']} | 📍 {cr['place_guess']} {coord_str}")
+        print("-" * 80 + "\n")
 
 def cmd_fetch(args, client: InatClient):
     """取得單筆詳細觀測紀錄"""
@@ -395,7 +451,7 @@ def cmd_fetch(args, client: InatClient):
         print(f"   └─ 連結: {detail['uri']}\n")
 
 def cmd_match_flora(args, client: InatClient):
-    """原住民生活植物名錄對照整合比對"""
+    """原住民生活植物名錄對照整合比對 (支援 synonyms 同義學名容錯與實體座標輸出)"""
     flora_data = load_flora_config(args.flora_file)
     species_list = flora_data.get("species", [])
     total_target = len(species_list)
@@ -403,49 +459,67 @@ def cmd_match_flora(args, client: InatClient):
     _, place_info = load_place_config(args.place, args.place_config)
     spatial_params = build_spatial_params(place_info, args.bbox, args.lat, args.lng, args.radius)
 
-    log_msg("INFO", f"開始進行原住民植物名錄對照整合 (共 {total_target} 種植物)...", verbose=args.verbose)
+    log_msg("INFO", f"開始進行原住民植物名錄對照整合 (共 {total_target} 種植物，支援同義學名自動容錯)...", verbose=args.verbose)
 
     matched_results = []
     missing_results = []
 
     for sp in species_list:
-        sci_name = sp["scientific_name"]
-        params = {"taxon_name": sci_name, "per_page": 5, "order_by": "observed_on", "order": "desc"}
-        if args.user:
-            params["user_id"] = args.user
-        if args.quality and args.quality != "any":
-            params["quality_grade"] = args.quality
-        params.update(spatial_params)
+        primary_sci_name = sp["scientific_name"]
+        candidates = [primary_sci_name] + sp.get("synonyms", [])
 
-        try:
-            res = client.request("observations", params)
-            total_obs = res.get("total_results", 0)
-            records = res.get("results", [])
-            if total_obs > 0:
-                first_rec = records[-1]
-                latest_rec = records[0]
-                matched_results.append({
-                    "id": sp.get("id"),
-                    "category": sp.get("category"),
-                    "common_name": sp.get("common_name"),
-                    "indigenous_name": sp.get("indigenous_name"),
-                    "scientific_name": sci_name,
-                    "total_observations": total_obs,
-                    "latest_date": latest_rec.get("observed_on"),
-                    "first_date": first_rec.get("observed_on"),
-                    "sample_obs_id": latest_rec.get("id")
-                })
-            else:
-                missing_results.append({
-                    "id": sp.get("id"),
-                    "category": sp.get("category"),
-                    "common_name": sp.get("common_name"),
-                    "indigenous_name": sp.get("indigenous_name"),
-                    "scientific_name": sci_name,
-                    "notes": sp.get("notes")
-                })
-        except Exception as e:
-            log_msg("WARN", f"比對物種 {sci_name} 發生錯誤: {e}", verbose=args.verbose)
+        hit_records = []
+        matched_candidate = None
+        total_obs = 0
+
+        for cand in candidates:
+            params = {"taxon_name": cand, "per_page": 5, "order_by": "observed_on", "order": "desc"}
+            if args.user:
+                params["user_id"] = args.user
+            if args.quality and args.quality != "any":
+                params["quality_grade"] = args.quality
+            params.update(spatial_params)
+
+            try:
+                res = client.request("observations", params)
+                obs_count = res.get("total_results", 0)
+                if obs_count > 0:
+                    total_obs = obs_count
+                    hit_records = res.get("results", [])
+                    matched_candidate = cand
+                    break
+            except Exception as e:
+                log_msg("DEBUG", f"比對 {cand} 異常: {e}", verbose=args.verbose)
+
+        if total_obs > 0 and hit_records:
+            first_rec = hit_records[-1]
+            latest_rec = hit_records[0]
+            latest_coords = (latest_rec.get("geojson") or {}).get("coordinates", [None, None])
+            matched_results.append({
+                "id": sp.get("id"),
+                "category": sp.get("category"),
+                "common_name": sp.get("common_name"),
+                "indigenous_name": sp.get("indigenous_name"),
+                "scientific_name": primary_sci_name,
+                "matched_scientific_name": matched_candidate,
+                "total_observations": total_obs,
+                "latest_date": latest_rec.get("observed_on"),
+                "first_date": first_rec.get("observed_on"),
+                "latest_user": (latest_rec.get("user") or {}).get("login"),
+                "latest_lat": latest_coords[1],
+                "latest_lng": latest_coords[0],
+                "latest_place": latest_rec.get("place_guess"),
+                "sample_obs_id": latest_rec.get("id")
+            })
+        else:
+            missing_results.append({
+                "id": sp.get("id"),
+                "category": sp.get("category"),
+                "common_name": sp.get("common_name"),
+                "indigenous_name": sp.get("indigenous_name"),
+                "scientific_name": primary_sci_name,
+                "notes": sp.get("notes")
+            })
 
     coverage_rate = (len(matched_results) / total_target * 100) if total_target > 0 else 0.0
 
@@ -466,16 +540,18 @@ def cmd_match_flora(args, client: InatClient):
     elif args.quiet:
         print(f"COVERAGE\t{output['matched_count']}/{output['total_target_species']}\t{output['coverage_rate_pct']}%")
         for m in matched_results:
-            print(f"MATCHED\t{m['scientific_name']}\t{m['common_name']}\t{m['total_observations']}")
+            print(f"MATCHED\t{m['scientific_name']}\t{m['common_name']}\t{m['total_observations']}\t{m['latest_lat']},{m['latest_lng']}")
     else:
         print(f"\n🌾 {output['title']} - 對照整合成果")
         print(f"   觀察者: {output['target_user']} | 地區: {output['place_filter']}")
         print(f"   🎯 名錄命中率: {output['matched_count']} / {output['total_target_species']} 種 ({output['coverage_rate_pct']}%)")
-        print("\n✅ 已記錄物種 (命中清單):")
-        print(f"{'類別':<10} {'俗名':<8} {'族語名':<15} {'學名':<25} {'次數':<5} {'最近紀錄'}")
-        print("-" * 75)
+        print("\n✅ 已記錄物種 (命中清單與代表點座標):")
+        print(f"{'類別':<10} {'俗名':<8} {'族語名':<15} {'學名':<25} {'次數':<5} {'最新座標與地點'}")
+        print("-" * 88)
         for m in matched_results:
-            print(f"{m['category']:<10} {m['common_name']:<8} {m['indigenous_name']:<15} {m['scientific_name']:<25} {m['total_observations']:<5} {m['latest_date']}")
+            coord_str = f"({m['latest_lat']:.4f},{m['latest_lng']:.4f})" if m['latest_lat'] and m['latest_lng'] else "N/A"
+            user_str = f"@{m['latest_user']}" if m['latest_user'] else ""
+            print(f"{m['category']:<10} {m['common_name']:<8} {m['indigenous_name']:<15} {m['scientific_name']:<25} {m['total_observations']:<5} {coord_str} {user_str}")
 
         if missing_results:
             print(f"\n⭕ 尚未記錄物種 ({len(missing_results)} 種，未來田野空缺):")
@@ -487,7 +563,11 @@ def cmd_analyze(args, client: InatClient):
     """多維度生態分析 (海拔垂直梯度 elevation / 物候季節性 phenology)"""
     flora_data = load_flora_config(args.flora_file)
     species_list = flora_data.get("species", [])
-    target_sci_names = {sp["scientific_name"]: sp for sp in species_list}
+    target_sci_names = set()
+    for sp in species_list:
+        target_sci_names.add(sp["scientific_name"])
+        for syn in sp.get("synonyms", []):
+            target_sci_names.add(syn)
 
     _, place_info = load_place_config(args.place, args.place_config)
     spatial_params = build_spatial_params(place_info, args.bbox, args.lat, args.lng, args.radius)
@@ -636,7 +716,6 @@ def cmd_export(args, client: InatClient):
 # ==================== CLI 主入口與參數解析 ====================
 
 def main():
-    # 建立通用 Parent Parser
     parent_parser = argparse.ArgumentParser(add_help=False)
     parent_parser.add_argument("-j", "--json", action="store_true", help="啟用單行緊湊 JSON 輸出 (Token-Saving)")
     parent_parser.add_argument("-q", "--quiet", action="store_true", help="極簡輸出模式")
@@ -647,7 +726,6 @@ def main():
     parent_parser.add_argument("--no-cache", action="store_true", help="停用本機 API 快取")
     parent_parser.add_argument("--manual", action="store_true", help="檢視完整說明書 (Rule 3)")
 
-    # 空間與區域參數 (通用可繼承)
     parent_parser.add_argument("--place", default=None, help="指定區域代號 (預設為 places.json 定義之 dulan，傳入 any 代表不限)")
     parent_parser.add_argument("--place-config", default=None, help="自訂區域設定檔路徑 (預設: data/ecology/places.json)")
     parent_parser.add_argument("--bbox", help="以四角座標覆蓋空間範圍: nelat,nelng,swlat,swlng")
@@ -667,10 +745,12 @@ def main():
     p_user = subparsers.add_parser("user", parents=[parent_parser], help="查詢觀察者畫像")
     p_user.add_argument("username", help="iNaturalist 使用者帳號")
 
-    # 2. search
-    p_search = subparsers.add_parser("search", parents=[parent_parser], help="輕量檢索觀測紀錄")
+    # 2. search (升級支援 --taxa 與 --flora-file 批次檢索)
+    p_search = subparsers.add_parser("search", parents=[parent_parser], help="輕量檢索觀測紀錄 (支援多物種/名錄批次查)")
     p_search.add_argument("--user", help="限定特定觀察者")
-    p_search.add_argument("--taxon", help="限定特定物種學名或俗名")
+    p_search.add_argument("--taxon", help="限定單一物種學名或俗名")
+    p_search.add_argument("--taxa", help="以逗號分隔批次查詢多個物種 (例如: 'Pandanus,Zanthoxylum,Erythrina')")
+    p_search.add_argument("--flora-file", default=None, help="指定原住民植物名錄 JSON 進行整份批次比對檢索")
     p_search.add_argument("--quality", choices=["research", "needs_id", "casual", "any"], default="any", help="資料品質等級")
 
     # 3. fetch
