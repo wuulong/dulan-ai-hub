@@ -1,0 +1,20 @@
+{
+  "default": "dulan",
+  "places": {
+    "dulan": {
+      "name": "台東都蘭 (東河鄉)",
+      "description": "台東縣東河鄉都蘭村，涵蓋都蘭海灘、新社部落、台11線至都蘭山稜線",
+      "bbox": {
+        "nelat": 22.92,
+        "nelng": 121.25,
+        "swlat": 22.84,
+        "swlng": 121.18
+      },
+      "center": {
+        "lat": 22.875,
+        "lng": 121.21,
+        "radius_km": 8.0
+      }
+    }
+  }
+}

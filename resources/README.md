@@ -10,7 +10,13 @@
 
 1.  📱 **[手機端 AI 軟體與操作小技巧]**(file:///Users/wuulong/github/bmad-pa/events/classes/dulan-ai-hub-private/dulan-ai-hub/resources/mobile-ai-guide.md)
     *   收錄如何安裝免費的 AI App（如 ChatGPT、Gemini 等）、手機語音輸入設定，以及長按複製等實用基本手勢操作。
-2.  📍 **實體陪伴教室聯絡簿**
+2.  ⚙️ **學習歷程自動化系統規範**
+    *   📘 **[系統架構與流程圖]**(file:///Users/wuulong/github/bmad-pa/events/classes/dulan-ai-hub-private/dulan-ai-hub/resources/system-architecture.md)：定義 Google Docs ➔ AI Skill ➔ GitHub 保存的增量掃描資料流與系統架構。
+    *   📘 **[學員操作手冊與講師維護指引]**(file:///Users/wuulong/github/bmad-pa/events/classes/dulan-ai-hub-private/dulan-ai-hub/resources/student-operational-manual.md)：學員筆記撰寫與命名規範，以及講師對 AI 系統的日常維護與排除說明。
+    *   📘 **[學習筆記範本]**(file:///Users/wuulong/github/bmad-pa/events/classes/dulan-ai-hub-private/dulan-ai-hub/resources/learning-note-template.md)：標準化學員筆記格式，以達最佳結構化解析效率。
+    *   📘 **[AI 技能邏輯規範]**(file:///Users/wuulong/github/bmad-pa/events/classes/dulan-ai-hub-private/dulan-ai-hub/resources/ai-skill-logic.md)：後台處理 Prompt 提示詞規則、Regex 切割定位與輸出 YAML front matter 的 markdown 規格。
+    *   🛠️ **[Google Drive 更新追蹤工具說明書]**(file:///Users/wuulong/github/bmad-pa/events/classes/dulan-ai-hub-private/dulan-ai-hub/resources/track-gdrive-updates-guide.md)：如何透過 scripts 內的腳本指令查詢特定日期後更新的筆記列表與連結。
+3.  📍 **實體陪伴教室聯絡簿**
     *   **都蘭教室：【四季八里自然莊園】**
         *   *現場教練*：阿鐘 (陳豊鍾)
         *   *陪伴時間*：隔週五晚上 20:30 - 21:30 (授課後)，其餘時間依莊園開放而定。

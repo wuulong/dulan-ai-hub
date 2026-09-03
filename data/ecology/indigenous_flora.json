@@ -1,0 +1,188 @@
+{
+  "region": "dulan",
+  "ethnicity": "Amis",
+  "title": "都蘭原住民傳統生活與文化植物名錄",
+  "description": "涵蓋阿美族飲食、香草、工藝、節氣與祭儀之 18 種指標性植物",
+  "species": [
+    {
+      "id": "flora-01",
+      "category": "飲食與包材",
+      "common_name": "林投",
+      "indigenous_name": "'angroy",
+      "family": "Pandanaceae",
+      "scientific_name": "Pandanus tectorius",
+      "habitat": "海岸林與沙灘帶 (0~50m)",
+      "notes": "常見海濱植物，海岸線點位豐富，防風定砂、葉片編織、果實食用。"
+    },
+    {
+      "id": "flora-02",
+      "category": "飲食與包材",
+      "common_name": "假酸漿",
+      "indigenous_name": "lavilu",
+      "family": "Boraginaceae",
+      "scientific_name": "Trichodesma calycosum",
+      "habitat": "林緣與淺山坡地 (50~300m)",
+      "notes": "原住民傳統粽 (haway/阿拜) 必備包裹內葉，具特殊香氣且助消化。"
+    },
+    {
+      "id": "flora-03",
+      "category": "飲食與包材",
+      "common_name": "樹豆",
+      "indigenous_name": "vataan / fata'an",
+      "family": "Fabaceae",
+      "scientific_name": "Cajanus cajan",
+      "habitat": "聚落農地周邊 (50~200m)",
+      "notes": "部落農地或周邊常有野生或栽培紀錄，傳統主食與活力來源。"
+    },
+    {
+      "id": "flora-04",
+      "category": "飲食與包材",
+      "common_name": "光果龍葵",
+      "indigenous_name": "tatukem",
+      "family": "Solanaceae",
+      "scientific_name": "Solanum americanum",
+      "habitat": "平野與田園荒地 (0~200m)",
+      "notes": "野菜經典 (烏甜仔菜)，全台平野大量紀錄，阿美族日常湯品常見野菜。"
+    },
+    {
+      "id": "flora-05",
+      "category": "飲食與包材",
+      "common_name": "野生山苦瓜",
+      "indigenous_name": "'alapit",
+      "family": "Cucurbitaceae",
+      "scientific_name": "Momordica charantia",
+      "habitat": "淺山開闊地與灌叢 (50~250m)",
+      "notes": "短包苦瓜，亦常直接紀錄為種層級 Momordica charantia，具清涼解熱風味。"
+    },
+    {
+      "id": "flora-06",
+      "category": "製麴與香草",
+      "common_name": "大葉田香草",
+      "indigenous_name": "faliyu",
+      "family": "Plantaginaceae",
+      "scientific_name": "Limnophila rugosa",
+      "habitat": "濕地與水田環境 (0~150m)",
+      "notes": "傳統酒麴之靈魂香草，具八角辛香氣息，濕地指標植物。"
+    },
+    {
+      "id": "flora-07",
+      "category": "製麴與香草",
+      "common_name": "過山香",
+      "indigenous_name": "rakaw",
+      "family": "Rutaceae",
+      "scientific_name": "Clausena excavata",
+      "habitat": "向陽坡地與次生林 (100~400m)",
+      "notes": "葉片具強烈辛香，低海拔山坡常見，常用於驅蟲、草藥與香料。"
+    },
+    {
+      "id": "flora-08",
+      "category": "製麴與香草",
+      "common_name": "食茱萸",
+      "indigenous_name": "tana'",
+      "family": "Rutaceae",
+      "scientific_name": "Zanthoxylum ailanthoides",
+      "habitat": "次生林與森林邊緣 (100~600m)",
+      "notes": "刺蔥，嫩葉香料，次生林先驅樹種，鳥不踏。"
+    },
+    {
+      "id": "flora-09",
+      "category": "製麴與香草",
+      "common_name": "艾納香",
+      "indigenous_name": "-",
+      "family": "Asteraceae",
+      "scientific_name": "Blumea balsamifera",
+      "habitat": "河床、開闊向陽荒地 (0~300m)",
+      "notes": "大風草，傳統青草、產婦藥浴與製麴常用草本。"
+    },
+    {
+      "id": "flora-10",
+      "category": "工藝與編織",
+      "common_name": "構樹",
+      "indigenous_name": "tapa",
+      "family": "Moraceae",
+      "scientific_name": "Broussonetia papyrifera",
+      "habitat": "平野與次生林開闊地 (0~300m)",
+      "notes": "鹿仔樹，南島語族樹皮布核心原料，荒地次生林極多。"
+    },
+    {
+      "id": "flora-11",
+      "category": "工藝與編織",
+      "common_name": "黃藤",
+      "indigenous_name": "'oway",
+      "family": "Arecaceae",
+      "scientific_name": "Calamus quiquesetinervius",
+      "habitat": "中低海拔森林中下層 (200~800m)",
+      "notes": "編織與建築骨幹，都蘭山林常見，藤心亦為名貴野菜。"
+    },
+    {
+      "id": "flora-12",
+      "category": "工藝與編織",
+      "common_name": "月桃",
+      "indigenous_name": "lengac",
+      "family": "Zingiberaceae",
+      "scientific_name": "Alpinia zerumbet",
+      "habitat": "森林下層與林緣 (0~400m)",
+      "notes": "葉鞘編織蓆墊、花果觀賞、葉片包粽，低海拔極普遍。"
+    },
+    {
+      "id": "flora-13",
+      "category": "工藝與編織",
+      "common_name": "山棕",
+      "indigenous_name": "dadok",
+      "family": "Arecaceae",
+      "scientific_name": "Arenga engleri",
+      "habitat": "陰濕森林底層 (100~600m)",
+      "notes": "蓑衣、掃帚纖維原料，羽狀複葉極具辨識度。"
+    },
+    {
+      "id": "flora-14",
+      "category": "節氣與特有種",
+      "common_name": "刺桐",
+      "indigenous_name": "tayuk",
+      "family": "Fabaceae",
+      "scientific_name": "Erythrina variegata",
+      "habitat": "低海拔平野與海濱 (0~150m)",
+      "notes": "阿美族曆法樹，春季盛開火紅花朵，代表新年開始與飛魚季啟動。"
+    },
+    {
+      "id": "flora-15",
+      "category": "節氣與特有種",
+      "common_name": "台灣海棗",
+      "indigenous_name": "toma",
+      "family": "Arecaceae",
+      "scientific_name": "Phoenix hanceana",
+      "habitat": "海岸山脈海崖與向陽岩壁 (0~200m)",
+      "notes": "冰河孓遺特有種，台灣四大老樹之一，台11線海崖指標植物。"
+    },
+    {
+      "id": "flora-16",
+      "category": "祭儀與避邪",
+      "common_name": "荖藤",
+      "indigenous_name": "da'dac",
+      "family": "Piperaceae",
+      "scientific_name": "Piper betle",
+      "habitat": "栽培園與林下爬藤 (50~300m)",
+      "notes": "荖葉，祭儀供品與在地重要經濟作物。"
+    },
+    {
+      "id": "flora-17",
+      "category": "祭儀與避邪",
+      "common_name": "檳榔",
+      "indigenous_name": "'icep",
+      "family": "Arecaceae",
+      "scientific_name": "Areca catechu",
+      "habitat": "聚落與農園 (0~300m)",
+      "notes": "部落傳統生活、社交與祭儀文化核心植物。"
+    },
+    {
+      "id": "flora-18",
+      "category": "祭儀與避邪",
+      "common_name": "芙蓉菊",
+      "indigenous_name": "-",
+      "family": "Asteraceae",
+      "scientific_name": "Crossostephium chinense",
+      "habitat": "聚落庭院與海濱岩石 (0~100m)",
+      "notes": "蘄艾，銀白葉色，避邪祈福植物，常栽植於庭院門前。"
+    }
+  ]
+}
