@@ -713,6 +713,125 @@ def cmd_export(args, client: InatClient):
         if not args.quiet:
             print(f"✅ 檔案已成功匯出至: {out_path} (共 {len(records)} 筆紀錄)")
 
+def cmd_bird_sounds(args, client: InatClient):
+    """查詢並下載都蘭 12 種指標鳥類的野外高品質鳴唱音訊"""
+    birds_file = args.birds_file or os.path.join(PROJECT_ROOT, "data/ecology/dulan_birds.json")
+    if not os.path.exists(birds_file):
+        raise FileNotFoundError(f"找不到指標鳥類設定檔: {birds_file}")
+
+    with open(birds_file, "r", encoding="utf-8") as f:
+        birds_data = json.load(f)
+    birds = birds_data.get("species") or birds_data.get("birds") or []
+
+    out_dir = os.path.abspath(args.sound_dir or os.path.join(PROJECT_ROOT, "data/ecology/sounds"))
+    if args.download:
+        os.makedirs(out_dir, exist_ok=True)
+
+    log_msg("INFO", f"開始檢索 {len(birds)} 種都蘭指標鳥類的野外錄音資產 (下載模式: {args.download})...", verbose=args.verbose)
+
+    sound_results = []
+    for b in birds:
+        b_id = b.get("id")
+        c_name = b.get("common_name")
+        sci = b.get("scientific_name")
+
+        params = {
+            "taxon_name": sci,
+            "sounds": "true",
+            "per_page": 5,
+            "order_by": "observed_on",
+            "order": "desc"
+        }
+
+        rec_item = None
+        total_rec = 0
+        try:
+            res = client.request("observations", params)
+            total_rec = res.get("total_results", 0)
+            results = res.get("results", [])
+
+            if results:
+                for cand_obs in results:
+                    sounds = cand_obs.get("sounds", [])
+                    if sounds and sounds[0].get("file_url"):
+                        rec_item = {
+                            "obs_id": cand_obs.get("id"),
+                            "observed_on": cand_obs.get("observed_on"),
+                            "user": (cand_obs.get("user") or {}).get("login"),
+                            "place_guess": cand_obs.get("place_guess"),
+                            "sound_id": sounds[0].get("id"),
+                            "file_url": sounds[0].get("file_url"),
+                            "file_type": sounds[0].get("file_content_type"),
+                            "license": sounds[0].get("license_code"),
+                            "attribution": sounds[0].get("attribution")
+                        }
+                        break
+        except Exception as e:
+            log_msg("WARN", f"檢索 {c_name} 錄音失敗: {e}", verbose=args.verbose)
+
+        download_path = None
+        if rec_item and args.download:
+            ext = ".m4a" if "mp4" in rec_item["file_type"] else ".mp3"
+            filename = f"{b_id}_{c_name}_{rec_item['sound_id']}{ext}"
+            file_dest = os.path.join(out_dir, filename)
+
+            if not os.path.exists(file_dest):
+                log_msg("INFO", f"正在下載 {c_name} 鳴唱音檔 ➔ {filename}...", verbose=args.verbose)
+                try:
+                    req = urllib.request.Request(
+                        rec_item["file_url"],
+                        headers={
+                            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+                            "Referer": "https://www.inaturalist.org/"
+                        }
+                    )
+                    with urllib.request.urlopen(req, timeout=30) as resp, open(file_dest, "wb") as f_out:
+                        f_out.write(resp.read())
+                    download_path = file_dest
+                except Exception as dl_err:
+                    log_msg("ERROR", f"下載 {c_name} 失敗: {dl_err}", verbose=args.verbose)
+            else:
+                download_path = file_dest
+
+        sound_results.append({
+            "id": b_id,
+            "category": b.get("category"),
+            "common_name": c_name,
+            "scientific_name": sci,
+            "total_recordings_available": total_rec,
+            "recording": rec_item,
+            "local_file": download_path
+        })
+        time.sleep(0.3)
+
+    if args.json:
+        output_data = {
+            "total_birds": len(birds),
+            "sounds_dir": out_dir if args.download else None,
+            "results": sound_results
+        }
+        print(json.dumps(output_data, ensure_ascii=False, separators=(',', ':')))
+    elif args.quiet:
+        for sr in sound_results:
+            rec = sr.get("recording") or {}
+            print(f"{sr['id']}\t{sr['common_name']}\t{sr['total_recordings_available']}\t{sr.get('local_file') or rec.get('file_url')}")
+    else:
+        print(f"\n🎵 都蘭 12 種指標鳥類野外鳴唱音訊清單 (iNaturalist 官方庫存)")
+        if args.download:
+            print(f"   💾 離線音檔儲存目錄: {out_dir}")
+        print("-" * 90)
+        print(f"{'編號':<8} {'中文名稱':<8} {'學名':<24} {'庫存筆數':<8} {'狀態 / 本地檔案 / 錄音資訊'}")
+        print("-" * 90)
+        for sr in sound_results:
+            rec = sr.get("recording")
+            if rec:
+                stat_str = f"✅ 已下載: {os.path.basename(sr['local_file'])}" if sr.get("local_file") else f"🔗 直連音檔 (Obs #{rec['obs_id']})"
+                lic_str = f"[{rec['license'] or 'All rights'}]"
+                print(f"[{sr['id']:<6}] {sr['common_name']:<8} {sr['scientific_name']:<24} {sr['total_recordings_available']:>4} 筆     {stat_str} {lic_str}")
+            else:
+                print(f"[{sr['id']:<6}] {sr['common_name']:<8} {sr['scientific_name']:<24} 暫無錄音")
+        print("-" * 90 + "\n")
+
 # ==================== CLI 主入口與參數解析 ====================
 
 def main():
@@ -774,14 +893,20 @@ def main():
     p_exp.add_argument("--user", help="限定特定觀察者")
     p_exp.add_argument("--format", choices=["geojson", "csv"], default="geojson", help="匯出格式")
 
-    # 7. schema
+    # 7. bird-sounds
+    p_sounds = subparsers.add_parser("bird-sounds", parents=[parent_parser], help="檢索與下載都蘭 12 種指標鳥類的野外錄音")
+    p_sounds.add_argument("--birds-file", default=None, help="自訂鳥類名錄 JSON (預設: data/ecology/dulan_birds.json)")
+    p_sounds.add_argument("--download", action="store_true", help="將高品質音檔下載至本機目錄")
+    p_sounds.add_argument("--sound-dir", default=None, help="指定音檔下載目錄 (預設: data/ecology/sounds)")
+
+    # 8. schema
     subparsers.add_parser("schema", parents=[parent_parser], help="輸出自我描述 JSON Schema")
 
-    # 8. manual
+    # 9. manual
     subparsers.add_parser("manual", parents=[parent_parser], help="檢視說明手冊")
 
     # 位置引數降級向下相容 (Pillar 10)
-    known_cmds = ["user", "search", "fetch", "match-flora", "analyze", "export", "schema", "manual", "-h", "--help"]
+    known_cmds = ["user", "search", "fetch", "match-flora", "analyze", "export", "bird-sounds", "schema", "manual", "-h", "--help"]
     if len(sys.argv) > 1 and sys.argv[1] not in known_cmds and not sys.argv[1].startswith("-"):
         sys.argv.insert(1, "search")
 
@@ -811,6 +936,8 @@ def main():
             cmd_analyze(args, client)
         elif args.subcommand == "export":
             cmd_export(args, client)
+        elif args.subcommand in ("bird-sounds", "sounds"):
+            cmd_bird_sounds(args, client)
         else:
             parser.print_help()
             sys.exit(0)
